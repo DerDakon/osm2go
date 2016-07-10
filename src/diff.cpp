@@ -83,6 +83,15 @@ static xmlNodePtr diff_save_state_n_id(const base_object_t *obj,
   return node;
 }
 
+static bool object_needs_save(const base_object_t *obj)
+{
+  const int flags = obj->flags;
+
+  /* objects that have been restored (i.e. were deleted upstream) and
+   * have been deleted afterwards do not need to be preserved. */
+  return (flags && (flags != (OSM_FLAG_DELETED | OSM_FLAG_RESTORED)));
+}
+
 struct diff_save_nodes {
   xmlNodePtr const root_node;
   diff_save_nodes(xmlNodePtr r) : root_node(r) {}
@@ -92,7 +101,7 @@ struct diff_save_nodes {
 void diff_save_nodes::operator()(std::pair<item_id_t, node_t *> pair)
 {
   const node_t * const node = pair.second;
-  if(!node->flags)
+  if(!object_needs_save(node))
     return;
 
   xmlNodePtr node_node = diff_save_state_n_id(node, root_node, "node");
@@ -119,7 +128,7 @@ struct diff_save_ways {
 void diff_save_ways::operator()(std::pair<item_id_t, way_t *> pair)
 {
   const way_t * const way = pair.second;
-  if(!way->flags)
+  if(!object_needs_save(way))
     return;
 
   xmlNodePtr node_way = diff_save_state_n_id(way, root_node, "way");
@@ -200,7 +209,7 @@ struct diff_save_relations {
 void diff_save_relations::operator()(std::pair<item_id_t, relation_t *> pair)
 {
   const relation_t * const relation = pair.second;
-  if(!relation->flags)
+  if(!object_needs_save(relation))
     return;
 
   xmlNodePtr node_rel = diff_save_state_n_id(relation, root_node, "relation");
@@ -377,7 +386,10 @@ static void diff_restore_node(xmlNodePtr node_node, osm_t *osm) {
     node = new node_t();
     node->id = id;
     node->visible = TRUE;
-    node->flags = OSM_FLAG_NEW;
+    if (id > 0)
+      node->flags = OSM_FLAG_RESTORED;
+    else
+      node->flags = OSM_FLAG_NEW;
     node->time = xml_get_prop_int(node_node, "time", 0);
     if(!node->time) node->time = time(NULL);
 

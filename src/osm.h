@@ -40,6 +40,7 @@ extern "C" {
 #define OSM_FLAG_DELETED  (1<<1)
 #define OSM_FLAG_NEW      (1<<2)
 #define OSM_FLAG_HIDDEN   (1<<3)
+#define OSM_FLAG_RESTORED (1<<4)
 
 /* item_id_t needs to be signed as osm2go uses negative ids for items */
 /* not yet registered with the main osm database */

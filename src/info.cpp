@@ -485,16 +485,21 @@ gboolean info_dialog(GtkWidget *parent, appdata_t *appdata, object_t *object) {
 
   context.tags = context.object.obj->tags.asPointerVector();
 
+  /* these word puzzles should usually be avoided, but since there are
+   * no translations anyway... */
+  const char *restored = context.object.obj->flags & OSM_FLAG_RESTORED ?
+                         _(" (RESTORED)") : "";
+
   switch(context.object.type) {
   case NODE:
-    str = g_strdup_printf(_("Node #" ITEM_ID_FORMAT),
-			  context.object.obj->id);
+    str = g_strdup_printf(_("Node #" ITEM_ID_FORMAT "%s"),
+			  context.object.obj->id, restored);
     context.presets_type = PRESETS_TYPE_NODE;
     break;
 
   case WAY:
-    str = g_strdup_printf(_("Way #" ITEM_ID_FORMAT),
-			  context.object.obj->id);
+    str = g_strdup_printf(_("Way #" ITEM_ID_FORMAT "%s"),
+			  context.object.obj->id, restored);
     context.presets_type = PRESETS_TYPE_WAY;
 
     if(context.object.way->is_closed())
@@ -503,8 +508,8 @@ gboolean info_dialog(GtkWidget *parent, appdata_t *appdata, object_t *object) {
     break;
 
   case RELATION:
-    str = g_strdup_printf(_("Relation #" ITEM_ID_FORMAT),
-			  context.object.obj->id);
+    str = g_strdup_printf(_("Relation #" ITEM_ID_FORMAT "%s"),
+			  context.object.obj->id, restored);
     context.presets_type = PRESETS_TYPE_RELATION;
     break;
 
