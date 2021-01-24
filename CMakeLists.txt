@@ -6,6 +6,8 @@ endif ()
 
 project(osm2go VERSION 0.9.17 LANGUAGES C CXX)
 
+message(STATUS "This is Travis build $ENV{TRAVIS_BUILD_ID} job $ENV{TRAVIS_JOB_ID} for commit $ENV{TRAVIS_COMMIT}")
+
 include(CMakePushCheckState)
 include(CheckCXXSourceCompiles)
 include(CheckFunctionExists)
